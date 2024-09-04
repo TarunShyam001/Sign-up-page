@@ -16,3 +16,23 @@ exports.postAddUsers = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
+
+
+exports.postAddLogin = async (req, res) => {
+  const {email, password} = req.body; 
+  try {
+    const existingUser = await Users.findOne({where : {email}});
+    if(existingUser) {
+      if(existingUser.password != password) {
+        return res.status(401).json({ message: 'Incorrect Password' });
+      } else {
+        return res.status(201).json({message: 'Login Successfully'});
+      }
+    } else {
+      return res.status(404).json({ message: 'User Not Found' });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
