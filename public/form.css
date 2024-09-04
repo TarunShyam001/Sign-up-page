@@ -6,14 +6,7 @@ body {
     margin: 15px;
 }
 
-#sign-up-form {
-    background-color: #81f5e9;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    width: 300px;
-}
-
+#sign-up-form,
 #login-form {
     background-color: #81f5e9;
     padding: 20px;
