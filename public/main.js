@@ -23,7 +23,9 @@ signUpForm.addEventListener('submit', async(event) => {
         errorMsg.textContent = '';
     }
     catch(error){
-        if(error.response && error.response.status === 409) {
+        if(error.response && (error.response.status === 409 || error.response.status === 404)) {
+            document.getElementById('email').value = "";
+            document.getElementById('password').value = "";
             errorMsg.textContent = `Error: ${error.response.data.message}`;
         } else {
             console.log('Error adding user: ',error);

@@ -1,5 +1,11 @@
 const { where } = require('sequelize');
 const Users = require('../models/users');
+const bcrypt = require('bcrypt');
+
+function isPasswordValid(str) {
+  const pattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z0-9]{8,20}$/; // Alphanumeric with at least one lowercase, one uppercase, one digit
+  return typeof str === 'string' && pattern.test(str);
+}
 
 exports.postAddUsers = async (req, res) => {
   const {username, email, password} = req.body; 
@@ -8,9 +14,26 @@ exports.postAddUsers = async (req, res) => {
     const existingUser = await Users.findOne({where : {email}});
     if(existingUser) {
         return res.status(409).json({ message: 'A user with the same email is already exists.' });
-    }
-    const user = await Users.create({ username, email, password }); 
+    } 
+    if (!isPasswordValid(password)) {
+      if(password.length < 8) {
+        return res.status(404).json({ message: 'The password length is too short' });
+      } else if(password.length > 20) {
+        return res.status(404).json({ message: 'The password length is too long' });
+      } else {
+        return res.status(404).json({ message: 'A password must have atleast one lower case, one higher case, and one digit (No other characters)' });
+      }
+    } 
+    const saltrounds = 10;
+    const hash = await bcrypt.hash(password, saltrounds);
+    const user = await Users.create({ username, email, password: hash }); 
     res.status(201).json(user);
+    
+    // bcrypt.hash(password, saltrounds, async(err, hash) => {
+    //   console.log(err);
+    //   const user = await Users.create({ username, email, password: hash}); 
+    //   return res.status(201).json(user);
+    // })
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server error' });
